@@ -82,6 +82,8 @@ sum(as.matrix(table(ClaimsTest$bucket2009, PredictTest.nolm))*PenaltyMatrix)/nro
 # New CART model with loss matrix
 ClaimsTree = rpart(bucket2009 ~ age + alzheimers + arthritis + cancer + copd + depression + diabetes + heart.failure + ihd + kidney + osteoporosis + stroke + bucket2008 + reimbursement2008, data=ClaimsTrain, method="class", cp=0.00005, parms=list(loss=PenaltyMatrix))
 
+ClaimsTree = rpart(bucket2009 ~ age + alzheimers + arthritis + cancer + copd + depression + diabetes + heart.failure + ihd + kidney + osteoporosis + stroke + bucket2008 + reimbursement2008, data=glb_entity_df, method="class", cp=0.00005, parms=list(loss=glb_loss_mtrx))
+
 # Redo predictions and penalty error
 PredictTest = predict(ClaimsTree, newdata = ClaimsTest, type = "class")
 
