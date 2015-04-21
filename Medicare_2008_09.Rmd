@@ -95,7 +95,7 @@ glb_split_newdata_method <- "sample"          # "condition" or "sample"
 glb_split_newdata_condition <- "<col_name> <condition_operator> <value>"    # or NULL
 glb_split_newdata_size_ratio <- 0.4               # > 0 & < 1
 glb_split_sample.seed <- 88               # or any integer
-glb_max_obs <- 20000 # or NULL
+glb_max_obs <- 500000 # or NULL
 
 glb_is_regression <- FALSE; glb_is_classification <- TRUE
 
@@ -144,8 +144,8 @@ glb_mice_complete.seed <- 144               # or any integer
 #               - better to feed as.numeric(<feat>.fctr) to caret 
 
 #glb_models_method_vctr <- c("glm", "rpart", "rf")   # Binomials
-#glb_models_method_vctr <- c("rpart", "rf")          # Multinomials
-glb_models_method_vctr <- c("rpart")          # Multinomials - this exercise
+glb_models_method_vctr <- c("rpart", "rf")          # Multinomials
+#glb_models_method_vctr <- c("rpart")          # Multinomials - this exercise
 
 glb_models_lst <- list(); glb_models_df <- data.frame()
 # Baseline prediction model feature(s)
@@ -787,11 +787,15 @@ for (method in glb_models_method_vctr) {
                             rsp_var=glb_rsp_var, rsp_var_out=glb_rsp_var_out,
                             fit_df=glb_entity_df, OOB_df=glb_newent_df,
                             n_cv_folds=glb_n_cv_folds, tune_models_df=NULL)
+    if (method == "rpart")
     ret_lst <- myfit_mdl_fn(model_id=paste0(model_id_pfx, ".lser.no.cp.4015"), model_method=method,
                             indep_vars_vctr=indep_vars_vctr,
                             rsp_var=glb_rsp_var, rsp_var_out=glb_rsp_var_out,
                             fit_df=glb_entity_df, OOB_df=glb_newent_df,
                             n_cv_folds=glb_n_cv_folds, tune_models_df=glb_tune_models_df)
+    
+    # rf is hard-coded in caret to recognize only Accuracy / Kappa evaluation metrics
+    #   only for OOB in trainControl ?
     ret_lst <- myfit_mdl_fn(model_id=paste0(model_id_pfx, ".lser.ys.cp.opt"), model_method=method,
                             indep_vars_vctr=indep_vars_vctr,
                             rsp_var=glb_rsp_var, rsp_var_out=glb_rsp_var_out,
@@ -801,6 +805,7 @@ for (method in glb_models_method_vctr) {
                             model_summaryFunction=glb_model_metric_smmry,
                             model_metric=glb_model_metric,
                             model_metric_maximize=glb_model_metric_maximize)
+    if (method == "rpart")
     ret_lst <- myfit_mdl_fn(model_id=paste0(model_id_pfx, ".lser.ys.cp.4015"), model_method=method,
                             indep_vars_vctr=indep_vars_vctr,
                             rsp_var=glb_rsp_var, rsp_var_out=glb_rsp_var_out,
@@ -1283,7 +1288,7 @@ The variance by am_fctr appears to be independent.
 #```
 We reject the null hypothesis i.e. we have evidence to conclude that am_fctr impacts mpg (95% confidence). Manual transmission is better for miles per gallon versus automatic transmission.
 
-#```{r print_sessionInfo, echo=FALSE}
+```{r print_sessionInfo, echo=FALSE}
 lcl_script_df <- glb_script_df
 rownames(lcl_script_df) <- seq(1, nrow(lcl_script_df))
 lcl_script_df$elapsed_diff <- sapply(seq(1, nrow(lcl_script_df)), 
@@ -1332,4 +1337,4 @@ print(ggplot(plot_script_df, aes(x=reorder(chunk_label_major, chunk_step_major_d
 #text(mdl_1$finalModel, use.n=TRUE, all=TRUE, cex=0.8)
 
 sessionInfo()
-#```
+```
